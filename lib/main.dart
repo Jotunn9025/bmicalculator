@@ -26,7 +26,11 @@ class _AppHomeState extends State<AppHome> {
         centerTitle: false,
         backgroundColor: Color.fromARGB(255, 225, 62, 51),
       ),
-      body: Center(
+      body:Stack( 
+            children:[
+
+              Image.asset('assets/bgimg.jpeg'),
+      Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -92,6 +96,7 @@ class _AppHomeState extends State<AppHome> {
             ),
           ],
         ),
+      ),],
       ),
       floatingActionButton: Container(
         width: 150,
@@ -104,12 +109,13 @@ class _AppHomeState extends State<AppHome> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    backgroundColor: Colors.grey,
+                    backgroundColor: Color.fromARGB(255, 245, 84, 72),
                     content: Text(
                       "Please input values\n\nClick outside the box or the back button to exit",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white54,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -125,7 +131,12 @@ class _AppHomeState extends State<AppHome> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      content: Text("INVALID BMI"),
+                      backgroundColor: Color.fromARGB(255, 233, 118, 10),
+                      content: Text("INVALID BMI",
+                      style: TextStyle(
+                        color:Colors.white70,
+                      ),
+                      ),
                     );
                   },
                 );
@@ -135,7 +146,12 @@ class _AppHomeState extends State<AppHome> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        content: Text("Underweight"),
+                        backgroundColor: Colors.red,
+                        content: Text("Underweight",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                        ),
                       );
                     },
                   );
@@ -144,7 +160,10 @@ class _AppHomeState extends State<AppHome> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        content: Text("Normal Weight"),
+                        backgroundColor: Color.fromARGB(255, 73, 234, 9),
+                        content: Text("Normal Weight",
+                        style:TextStyle(color: Colors.black87) ,
+                        ),
                       );
                     },
                   );
@@ -153,7 +172,10 @@ class _AppHomeState extends State<AppHome> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        content: Text("Overweight"),
+                        backgroundColor: const Color.fromRGBO(233, 118, 10, 1),
+                        content: Text("Overweight",
+                        style: TextStyle(color: Colors.black54),
+                        ),
                       );
                     },
                   );
@@ -162,6 +184,7 @@ class _AppHomeState extends State<AppHome> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
+                        backgroundColor: Colors.red,
                         content: Text("Obese"),
                       );
                     },
