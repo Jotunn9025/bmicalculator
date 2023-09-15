@@ -15,7 +15,7 @@ class _AppHomeState extends State<AppHome> {
   TextEditingController heightcntrl = TextEditingController();
   TextEditingController weightcntrl = TextEditingController();
   double BMIResult = 0.0;
-
+  int unit = 1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,77 +26,80 @@ class _AppHomeState extends State<AppHome> {
         centerTitle: false,
         backgroundColor: Color.fromARGB(255, 225, 62, 51),
       ),
-      body:Stack( 
-            children:[
-
-              Image.asset('assets/bgimg.jpeg'),
-      Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              'Please ensure that you use the metric system only.',
-              style: TextStyle(
-                color: Colors.black54,
-                fontFamily: 'Indieflower',
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-            Text(
-              'We currently do not support the imperial system\n',
-              style: TextStyle(
-                color: Colors.black54,
-                fontFamily: 'Indieflower',
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-            Text('Enter your height '),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 2.0,
-                  color: Colors.black54,
+      body: Stack(
+        children: [
+          Image.asset('assets/bgimg.jpeg'),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                RadioListTile(
+                  value: 1,
+                  groupValue: unit,
+                  onChanged: (int? value) {
+                    setState(() {
+                      unit = value!;
+                    });
+                  },
+                  title: Text('Metric system'),
                 ),
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-              child: TextField(
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: 'Height (in centimeters)',
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 8.0,
+                RadioListTile(
+                  value: 2,
+                  groupValue: unit,
+                  onChanged: (int? value) {
+                    setState(() {
+                      unit = value!;
+                    });
+                  },
+                  title: Text("Imperial system"),
+                ),
+                Text('Enter your height '),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 2.0,
+                      color: Colors.black54,
+                    ),
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText:
+                          unit == 1 ? 'Height(in cm)' : 'Height(in inches)',
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 8.0,
+                      ),
+                    ),
+                    controller: heightcntrl,
                   ),
                 ),
-                controller: heightcntrl,
-              ),
-            ),
-            Text('\n\nEnter your weight'),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 2.0,
-                  color: Colors.black54,
-                ),
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-              child: TextField(
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: 'Weight (in kg)',
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 8.0,
+                Text('\n\nEnter your weight'),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 2.0,
+                      color: Colors.black54,
+                    ),
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: unit == 1 ? 'Weight(in kg)' : 'Weight(in lbs)',
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 8.0,
+                      ),
+                    ),
+                    controller: weightcntrl,
                   ),
                 ),
-                controller: weightcntrl,
-              ),
+              ],
             ),
-          ],
-        ),
-      ),],
+          ),
+        ],
       ),
       floatingActionButton: Container(
         width: 150,
@@ -125,17 +128,24 @@ class _AppHomeState extends State<AppHome> {
             } else {
               double heightcm = double.tryParse(heighttxt) ?? 0.0;
               double weightkg = double.tryParse(weighttxt) ?? 0.0;
-              BMIResult = ((weightkg * 10000) / (heightcm * heightcm));
+              if (unit == 1) {
+                BMIResult = ((weightkg * 10000) / (heightcm * heightcm));
+                BMIResult = roundNearestTenth(BMIResult);
+              } else {
+                BMIResult = ((703 * weightkg) / (heightcm * heightcm));
+                BMIResult = roundNearestTenth(BMIResult);
+              }
               if (!BMIResult.isFinite) {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
                       backgroundColor: Color.fromARGB(255, 233, 118, 10),
-                      content: Text("INVALID BMI",
-                      style: TextStyle(
-                        color:Colors.white70,
-                      ),
+                      content: Text(
+                        "INVALID BMI",
+                        style: TextStyle(
+                          color: Colors.white70,
+                        ),
                       ),
                     );
                   },
@@ -147,10 +157,11 @@ class _AppHomeState extends State<AppHome> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         backgroundColor: Colors.red,
-                        content: Text("Underweight",
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
+                        content: Text(
+                          "Underweight:" + BMIResult.toString(),
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
                         ),
                       );
                     },
@@ -161,8 +172,9 @@ class _AppHomeState extends State<AppHome> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         backgroundColor: Color.fromARGB(255, 73, 234, 9),
-                        content: Text("Normal Weight",
-                        style:TextStyle(color: Colors.black87) ,
+                        content: Text(
+                          "Normal Weight:" + BMIResult.toString(),
+                          style: TextStyle(color: Colors.black87),
                         ),
                       );
                     },
@@ -173,8 +185,9 @@ class _AppHomeState extends State<AppHome> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         backgroundColor: const Color.fromRGBO(233, 118, 10, 1),
-                        content: Text("Overweight",
-                        style: TextStyle(color: Colors.black54),
+                        content: Text(
+                          "Overweight:" + BMIResult.toString(),
+                          style: TextStyle(color: Colors.black54),
                         ),
                       );
                     },
@@ -185,7 +198,7 @@ class _AppHomeState extends State<AppHome> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         backgroundColor: Colors.red,
-                        content: Text("Obese"),
+                        content: Text("Obese:" + BMIResult.toString()),
                       );
                     },
                   );
@@ -201,4 +214,8 @@ class _AppHomeState extends State<AppHome> {
       resizeToAvoidBottomInset: false,
     );
   }
+}
+
+double roundNearestTenth(double BMIResult) {
+  return ((BMIResult * 10).round()) / 10;
 }
